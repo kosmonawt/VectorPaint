@@ -1,5 +1,6 @@
 package VectorPaint.Controller;
 
+import VectorPaint.SDAFileReader;
 import VectorPaint.Tool;
 import VectorPaint.shapes.Line;
 import VectorPaint.shapes.Rectangle;
@@ -22,7 +23,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class Controller {
 
@@ -178,5 +181,25 @@ public class Controller {
             ex.printStackTrace();
         }
     }
+
+    @FXML
+    public void handleLoad() {
+        FileChooser fileChooser = new FileChooser();
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("YOLO files (*.yolo)", "*.yolo");
+        fileChooser.getExtensionFilters().add(extFilter);
+
+        File file = fileChooser.showOpenDialog(new Stage());
+        if (file != null) {
+            ShapeFactory factory = new ShapeFactory();
+            SDAFileReader fileReader = new SDAFileReader(file);
+            shapeList = fileReader.readFile().stream()
+                    .map(factory::get)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+            refreshCanvas();
+        }
+    }
+
+
 }
 
